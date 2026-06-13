@@ -1,0 +1,1000 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>وجهتي</title>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;900&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#f5f7fb;
+  --surface:#ffffff;
+  --surface-2:#eef4ff;
+  --text:#0b0f1a;
+  --muted:#64748b;
+  --border:#e2e8f0;
+  --primary:#2563eb;
+  --primary-2:#0ea5a0;
+  --primary-soft:#eef4ff;
+  --shadow:0 12px 34px rgba(15,23,42,.08);
+  --radius:18px;
+  --radius-lg:24px;
+  --sidebar-w:240px;
+  --sidebar-collapsed:64px;
+}
+[data-theme="dark"]{
+  --bg:#0b1020;
+  --surface:#12192d;
+  --surface-2:#17213a;
+  --text:#f7fafc;
+  --muted:#9aa4b2;
+  --border:#23304b;
+  --primary:#4f8cff;
+  --primary-2:#11b7b0;
+  --primary-soft:#17213a;
+  --shadow:0 16px 38px rgba(0,0,0,.22);
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{height:100%}
+body{
+  font-family:'Cairo',sans-serif;
+  background:var(--bg);
+  color:var(--text);
+  overflow:hidden;
+  transition:background .22s ease,color .22s ease;
+}
+body.en{font-family:'Inter',sans-serif;direction:ltr}
+body.ar{direction:rtl}
+button,input,textarea{font:inherit}
+button{cursor:pointer}
+#app{display:flex;height:100vh}
+
+/* Sidebar */
+#sidebar{
+  width:var(--sidebar-collapsed);
+  min-width:var(--sidebar-collapsed);
+  background:linear-gradient(180deg,#0a0f1e 0%,#10182b 100%);
+  display:flex;flex-direction:column;
+  overflow:hidden;
+  transition:width .28s ease,min-width .28s ease;
+  z-index:30;
+}
+#sidebar.expanded{width:var(--sidebar-w);min-width:var(--sidebar-w)}
+.sb-logo{
+  min-height:64px;
+  padding:14px;
+  border-bottom:1px solid rgba(255,255,255,.08);
+  display:flex;align-items:center;gap:10px;
+}
+.sb-logo-mark{
+  width:36px;height:36px;border-radius:12px;
+  background:linear-gradient(135deg,var(--primary),var(--primary-2));
+  display:grid;place-items:center;
+  color:#fff;font-weight:900;
+}
+.sb-logo-text{
+  color:#fff;font-weight:900;font-size:1.05rem;opacity:0;transition:opacity .18s;
+}
+.sb-logo-sub{color:rgba(255,255,255,.35);font-size:.62rem;white-space:nowrap}
+#sidebar.expanded .sb-logo-text{opacity:1}
+.sb-nav{
+  flex:1;
+  padding:10px;
+  display:flex;flex-direction:column;gap:6px;
+  overflow:auto;
+}
+.sb-item{
+  position:relative;
+  display:flex;align-items:center;gap:12px;
+  min-height:46px;
+  padding:10px 12px;
+  border-radius:14px;
+  color:rgba(255,255,255,.58);
+  transition:background .16s ease,color .16s ease,transform .15s ease;
+  user-select:none;
+}
+.sb-item:hover{background:rgba(255,255,255,.08);color:#fff;transform:translateX(-1px)}
+.sb-item.active{background:rgba(37,99,235,.28);color:#fff}
+.sb-icon{
+  width:34px;height:34px;border-radius:12px;
+  background:rgba(255,255,255,.08);
+  display:grid;place-items:center;flex:0 0 auto
+}
+.sb-label{opacity:0;white-space:nowrap;font-weight:700;font-size:.9rem;transition:opacity .16s}
+#sidebar.expanded .sb-label{opacity:1}
+.sb-tooltip{
+  position:absolute;top:50%;transform:translateY(-50%);
+  right:calc(100% + 10px);
+  background:var(--surface);color:var(--text);
+  padding:6px 10px;border-radius:10px;
+  box-shadow:var(--shadow);
+  font-size:.78rem;font-weight:700;
+  white-space:nowrap;
+  opacity:0;pointer-events:none;
+  transition:opacity .14s ease;
+}
+#sidebar:not(.expanded) .sb-item:hover .sb-tooltip{opacity:1}
+.sb-badge{
+  margin-right:auto;
+  background:var(--primary);
+  color:#fff;
+  padding:2px 8px;border-radius:999px;
+  font-size:.62rem;font-weight:800;
+}
+#sidebar.expanded .sb-badge{opacity:1}
+.sb-footer{
+  padding:14px;
+  border-top:1px solid rgba(255,255,255,.08);
+}
+.sb-user{
+  display:flex;align-items:center;gap:10px;
+  padding:10px 12px;
+  border-radius:16px;
+  background:rgba(255,255,255,.06);
+}
+.sb-user-avatar{
+  width:36px;height:36px;border-radius:50%;
+  background:linear-gradient(135deg,var(--primary),var(--primary-2));
+  display:grid;place-items:center;color:#fff;font-weight:800;
+}
+.sb-user-name{color:#fff;font-size:.84rem;font-weight:800}
+.sb-user-id{color:rgba(255,255,255,.35);font-size:.68rem}
+
+/* Main */
+#main{flex:1;display:flex;flex-direction:column;overflow:hidden}
+.topbar{
+  height:64px;
+  background:rgba(255,255,255,.9);
+  backdrop-filter:blur(12px);
+  border-bottom:1px solid var(--border);
+  display:flex;align-items:center;gap:12px;
+  padding:0 16px;
+  position:relative;
+}
+[data-theme="dark"] .topbar{background:rgba(18,25,45,.9)}
+.topbar-left,.topbar-right{display:flex;align-items:center;gap:10px}
+.topbar-right{margin-right:auto}
+.topbar-title{font-weight:900;font-size:1rem;color:var(--text)}
+.topbar-sub{color:var(--muted);font-size:.8rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+
+.menu-btn,.login-btn,.icon-btn,.side-menu-item,.lang-btn,.theme-btn{
+  border:none;
+  transition:transform .15s ease,filter .15s ease,background .15s ease;
+}
+.menu-btn{
+  width:42px;height:42px;border-radius:14px;
+  background:var(--surface);
+  border:1px solid var(--border);
+  color:var(--text);
+  display:grid;place-items:center;
+  box-shadow:0 2px 10px rgba(15,23,42,.04);
+}
+.login-btn{
+  height:42px;
+  padding:0 16px;
+  border-radius:14px;
+  background:var(--primary);
+  color:#fff;
+  font-weight:800;
+}
+.icon-btn{
+  width:42px;height:42px;border-radius:14px;
+  background:var(--surface);
+  border:1px solid var(--border);
+  color:var(--text);
+  display:grid;place-items:center;
+}
+.theme-btn.active,.lang-btn.active{background:var(--primary);color:#fff;border-color:var(--primary)}
+.menu-btn:hover,.login-btn:hover,.icon-btn:hover,.lang-btn:hover,.theme-btn:hover{transform:translateY(-1px);filter:brightness(1.03)}
+
+.bot-circle{
+  width:46px;height:46px;
+  border:none;border-radius:50%;
+  background:linear-gradient(135deg,var(--primary),var(--primary-2));
+  color:#fff;font-size:1.1rem;
+  display:grid;place-items:center;
+  box-shadow:0 12px 24px rgba(37,99,235,.22);
+}
+.side-menu{
+  position:absolute;
+  top:62px;
+  right:12px;
+  width:min(320px,calc(100vw - 24px));
+  background:var(--surface);
+  border:1px solid var(--border);
+  border-radius:18px;
+  box-shadow:var(--shadow);
+  padding:8px;
+  display:none;
+  z-index:40;
+}
+.side-menu.open{display:block}
+.side-menu-item{
+  width:100%;
+  background:transparent;
+  padding:12px 12px;
+  border-radius:14px;
+  color:var(--text);
+  font-weight:800;
+  display:flex;align-items:center;gap:10px;
+  text-align:inherit;
+}
+.side-menu-item:hover{background:var(--primary-soft);color:var(--primary)}
+
+#pages{flex:1;overflow:auto;padding:24px 28px}
+.page{display:none}
+.page.active{display:block}
+.pg-header{margin-bottom:20px}
+.pg-eyebrow{font-size:.72rem;font-weight:900;letter-spacing:2px;text-transform:uppercase;color:var(--primary);margin-bottom:6px}
+.pg-title{font-size:1.55rem;font-weight:900;color:var(--text)}
+.pg-sub{font-size:.88rem;color:var(--muted);margin-top:4px}
+
+.grid-2{display:grid;grid-template-columns:repeat(2,1fr);gap:16px}
+.grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.card,.course-card,.post-card,.auth-card,.modal-card,.chat-box,.stat-box{
+  background:var(--surface);
+  border:1px solid var(--border);
+  border-radius:20px;
+  box-shadow:var(--shadow);
+}
+.card{padding:20px}
+.card-hover{cursor:pointer;transition:transform .18s ease,box-shadow .18s ease,border-color .18s ease}
+.card-hover:hover{transform:translateY(-3px);border-color:rgba(37,99,235,.25)}
+
+.home-hero{
+  border-radius:28px;
+  padding:40px 36px;
+  margin-bottom:22px;
+  overflow:hidden;
+  background:
+    radial-gradient(circle at top left,rgba(37,99,235,.22),transparent 28%),
+    radial-gradient(circle at bottom right,rgba(14,165,160,.18),transparent 24%),
+    linear-gradient(135deg,#0b0f1a 0%,#1a2237 100%);
+}
+.home-hero-inner{max-width:640px;position:relative;z-index:1}
+.home-tag{
+  display:inline-flex;align-items:center;gap:7px;
+  padding:6px 12px;border-radius:999px;
+  color:rgba(255,255,255,.8);
+  background:rgba(255,255,255,.08);
+  border:1px solid rgba(255,255,255,.12);
+  font-size:.74rem;font-weight:800;
+  margin-bottom:16px;
+}
+.pulse-dot{width:7px;height:7px;border-radius:50%;background:var(--primary-2);animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.35}}
+.home-hero h1{color:#fff;font-size:2.2rem;line-height:1.18;margin-bottom:10px;font-weight:900}
+.home-hero h1 em{font-style:normal;color:var(--primary-2)}
+.home-hero p{color:rgba(255,255,255,.65);line-height:1.9;font-size:.95rem;max-width:60ch}
+.home-hero-btns{display:flex;gap:12px;flex-wrap:wrap;margin-top:24px}
+.btn-white,.btn-outline-w,.btn,.year-tab,.filter-btn{
+  font-family:inherit;font-weight:900
+}
+.btn-white{
+  background:#fff;color:var(--text);border:none;padding:11px 20px;border-radius:14px
+}
+.btn-outline-w{
+  background:transparent;color:#fff;border:1px solid rgba(255,255,255,.22);padding:11px 20px;border-radius:14px
+}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:10px 18px;border-radius:14px;border:none}
+.btn-primary{background:var(--primary);color:#fff}
+.btn-ghost{background:#fff;color:var(--primary);border:1px solid var(--primary)}
+.stat-row{display:flex;gap:14px;flex-wrap:wrap;margin-bottom:20px}
+.stat-box{flex:1;min-width:150px;padding:18px 20px}
+.stat-val{font-family:'Space Mono',monospace;font-size:1.5rem;font-weight:700;color:var(--text)}
+.stat-lbl{font-size:.73rem;color:var(--muted);font-weight:700;margin-top:2px}
+.stat-delta{font-size:.7rem;color:var(--primary-2);font-weight:800;margin-top:4px}
+
+.feature-mini{display:flex;gap:14px;align-items:flex-start}
+.feature-mini-icon{width:44px;height:44px;border-radius:14px;display:grid;place-items:center;font-size:1.15rem;flex:0 0 auto}
+.feature-mini h4{font-size:.94rem;font-weight:900;margin-bottom:4px}
+.feature-mini p{font-size:.8rem;color:var(--muted);line-height:1.7}
+.tag{display:inline-flex;align-items:center;gap:5px;padding:3px 10px;border-radius:999px;font-size:.7rem;font-weight:800}
+.tag-blue{background:var(--primary-soft);color:var(--primary)}
+.tag-teal{background:var(--teal-lt);color:var(--primary-2)}
+.tag-amber{background:var(--amber-lt);color:#b45309}
+.tag-rose{background:var(--rose-lt);color:var(--rose)}
+
+.toolbar{
+  display:flex;gap:10px;flex-wrap:wrap;align-items:center;
+  margin-bottom:18px
+}
+.search-box{
+  min-width:220px;
+  flex:1;
+  display:flex;align-items:center;gap:8px;
+  background:var(--surface);
+  border:1px solid var(--border);
+  border-radius:14px;
+  padding:10px 14px;
+}
+.search-box input{
+  border:none;background:transparent;outline:none;width:100%;color:var(--text)
+}
+.search-box span{color:var(--muted)}
+.toggle-group{display:flex;gap:8px;flex-wrap:wrap}
+
+.year-tabs,.forum-filter{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:18px}
+.year-tab,.filter-btn,.lang-btn,.theme-btn{
+  padding:8px 16px;
+  border-radius:999px;
+  border:1px solid var(--border);
+  background:var(--surface);
+  color:var(--muted);
+  font-size:.8rem;
+  cursor:pointer
+}
+.year-tab.active,.year-tab:hover,.filter-btn.active,.lang-btn.active,.theme-btn.active{
+  background:var(--primary);color:#fff;border-color:var(--primary)
+}
+.course-card{overflow:hidden;transition:transform .18s ease,box-shadow .18s ease}
+.course-card:hover{transform:translateY(-3px);box-shadow:var(--shadow)}
+.course-card-top{padding:18px;border-bottom:1px solid var(--border)}
+.course-card-icon{font-size:1.45rem;margin-bottom:8px}
+.course-card h4{font-size:.95rem;font-weight:900;margin-bottom:4px}
+.course-card p{font-size:.75rem;color:var(--muted)}
+.course-card-footer{padding:12px 18px;display:flex;gap:8px;flex-wrap:wrap}
+.resource-chip{display:flex;align-items:center;gap:4px;font-size:.68rem;font-weight:800;color:var(--muted)}
+
+.new-post-btn{
+  display:flex;align-items:center;gap:8px;padding:16px 18px;border-radius:18px;
+  background:var(--surface);border:2px dashed var(--border);color:var(--muted);font-weight:800;cursor:pointer;
+  margin-bottom:16px;transition:border-color .15s,color .15s,transform .15s
+}
+.new-post-btn:hover{border-color:var(--primary);color:var(--primary);transform:translateY(-1px)}
+.post-card{padding:18px;transition:transform .18s ease,border-color .18s ease}
+.post-card:hover{transform:translateY(-2px);border-color:rgba(37,99,235,.28)}
+.post-head{display:flex;align-items:center;gap:10px;margin-bottom:12px}
+.avatar{width:36px;height:36px;border-radius:50%;display:grid;place-items:center;font-size:.78rem;font-weight:900;color:#fff;flex:0 0 auto}
+.av1{background:linear-gradient(135deg,#667eea,#764ba2)}
+.av2{background:linear-gradient(135deg,#f093fb,#f5576c)}
+.av3{background:linear-gradient(135deg,#43e97b,#38f9d7)}
+.av4{background:linear-gradient(135deg,#4facfe,#00f2fe)}
+.post-user-name{font-size:.84rem;font-weight:900}
+.post-user-id{font-size:.7rem;color:var(--muted)}
+.post-time{margin-right:auto;font-size:.7rem;color:var(--muted)}
+.post-title{font-size:.95rem;font-weight:900;margin-bottom:6px}
+.post-excerpt{font-size:.82rem;color:var(--muted);line-height:1.7;margin-bottom:12px}
+.post-foot{display:flex;gap:14px;flex-wrap:wrap}
+.post-stat{font-size:.74rem;color:var(--muted);display:flex;align-items:center;gap:4px}
+
+.quiz-wrap{max-width:640px;margin:0 auto}
+.quiz-step{display:none}
+.quiz-step.active{display:block}
+.quiz-progress{height:5px;background:var(--border);border-radius:999px;margin-bottom:22px;overflow:hidden}
+.quiz-bar{height:100%;background:linear-gradient(90deg,var(--primary),var(--primary-2))}
+.quiz-q{font-size:1rem;font-weight:900;margin-bottom:16px;line-height:1.7}
+.quiz-options{display:flex;flex-direction:column;gap:10px;margin-bottom:18px}
+.quiz-opt{
+  padding:13px 16px;border-radius:14px;border:2px solid var(--border);background:var(--surface);cursor:pointer;
+  text-align:inherit;font-weight:800;transition:border-color .15s,background .15s,color .15s
+}
+.quiz-opt:hover,.quiz-opt.selected{border-color:var(--primary);background:var(--primary-soft);color:var(--primary)}
+.quiz-nav{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap}
+
+.result-card{
+  padding:28px 24px;text-align:center;
+  background:linear-gradient(135deg,#0b0f1a 0%,#1a2237 100%);
+  color:#fff;border:none;border-radius:22px
+}
+.result-icon{font-size:3rem;margin-bottom:10px}
+.result-title{font-size:1.35rem;font-weight:900;margin-bottom:8px}
+.result-desc{font-size:.86rem;color:rgba(255,255,255,.68);line-height:1.85}
+.roadmap{display:flex;flex-direction:column}
+.roadmap-item{display:flex;gap:16px}
+.roadmap-line{display:flex;flex-direction:column;align-items:center}
+.roadmap-dot{width:14px;height:14px;border-radius:50%;margin-top:4px}
+.roadmap-connector{width:2px;flex:1;background:var(--border);min-height:32px;margin:4px 0}
+.roadmap-content{padding-bottom:22px}
+.roadmap-content h4{font-size:.92rem;font-weight:900;margin-bottom:4px}
+.roadmap-content p{font-size:.8rem;color:var(--muted);line-height:1.65}
+.course-ext{
+  background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:14px 16px;
+  display:flex;align-items:center;gap:12px
+}
+.course-ext-icon{width:42px;height:42px;border-radius:14px;display:grid;place-items:center;font-size:1.1rem}
+.course-ext h4{font-size:.88rem;font-weight:900;margin-bottom:2px}
+.course-ext p{font-size:.74rem;color:var(--muted)}
+.course-ext-badge{margin-right:auto}
+
+#bot-page{display:none;flex-direction:column;height:100%}
+.chat-wrap{flex:1;overflow:auto;padding:26px 28px;display:flex;flex-direction:column;gap:16px}
+.msg{display:flex;gap:10px;max-width:740px}
+.msg-bot{align-self:flex-start}
+.msg-user{align-self:flex-end;flex-direction:row-reverse}
+.msg-avatar{width:38px;height:38px;border-radius:50%;display:grid;place-items:center;font-size:.9rem;flex:0 0 auto}
+.bot-av{background:linear-gradient(135deg,var(--primary),var(--primary-2))}
+.user-av{background:#111827;color:#fff}
+.bubble{
+  padding:12px 15px;border-radius:16px;font-size:.88rem;line-height:1.8
+}
+.bubble-bot{background:var(--surface);border:1px solid var(--border);border-radius:6px 16px 16px 16px}
+.bubble-user{background:var(--primary);color:#fff;border-radius:16px 6px 16px 16px}
+.msg-time{font-size:.66rem;color:var(--muted);margin-top:4px;padding:0 6px}
+.chat-bar{
+  border-top:1px solid var(--border);background:var(--surface);
+  padding:12px 28px;display:flex;gap:10px;align-items:center
+}
+#chat-input{
+  flex:1;min-height:46px;max-height:130px;resize:none;border:1px solid var(--border);background:var(--bg);
+  border-radius:14px;padding:12px 15px;outline:none;color:var(--text)
+}
+#chat-input:focus{border-color:var(--primary)}
+.send-btn{
+  width:46px;height:46px;border:none;border-radius:14px;background:var(--primary);color:#fff;font-size:1.05rem;cursor:pointer
+}
+
+/* Auth Modal */
+.modal{
+  position:fixed;inset:0;background:rgba(15,23,42,.5);
+  display:none;align-items:center;justify-content:center;
+  padding:18px;z-index:80;
+}
+.modal.open{display:flex}
+.modal-card{
+  width:min(440px,100%);
+  padding:22px;
+}
+.modal-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px}
+.modal-title{font-size:1.05rem;font-weight:900}
+.close-btn{
+  width:38px;height:38px;border:none;border-radius:12px;background:var(--bg);color:var(--text)
+}
+.field{display:flex;flex-direction:column;gap:8px;margin-bottom:12px}
+.field label{font-size:.82rem;font-weight:800;color:var(--muted)}
+.field input{
+  height:46px;border-radius:14px;border:1px solid var(--border);background:var(--bg);
+  color:var(--text);padding:0 14px;outline:none
+}
+.field input:focus{border-color:var(--primary)}
+.auth-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}
+.auth-note{font-size:.76rem;color:var(--muted);line-height:1.65;margin-top:10px}
+
+/* Responsive */
+@media(max-width:1100px){
+  #sidebar{display:none}
+  #pages{padding:18px}
+}
+@media(max-width:820px){
+  .grid-2,.grid-3{grid-template-columns:1fr}
+  .topbar-sub{display:none}
+  .search-box{min-width:0}
+}
+@media(max-width:540px){
+  .topbar{padding:0 12px;gap:8px}
+  .login-btn{padding:0 12px;font-size:.82rem}
+  .topbar-title{font-size:.92rem}
+  .home-hero{padding:28px 20px}
+  .home-hero h1{font-size:1.75rem}
+  .chat-wrap,.chat-bar{padding-left:14px;padding-right:14px}
+  .modal-card{padding:18px}
+  .toolbar{flex-direction:column;align-items:stretch}
+}
+</style>
+</head>
+<body class="ar" data-theme="light">
+<div id="app">
+
+<aside id="sidebar">
+  <div class="sb-logo">
+    <div class="sb-logo-mark">🧭</div>
+    <div>
+      <div class="sb-logo-text" data-i18n="brand">وجهتي</div>
+      <div class="sb-logo-sub" data-i18n="subtitle">هندسة أنظمة الحاسوب</div>
+    </div>
+  </div>
+
+  <nav class="sb-nav">
+    <div class="sb-item active" onclick="goTo('home',this)" tabindex="0">
+      <div class="sb-icon">🏠</div><span class="sb-label" data-i18n="home">الرئيسية</span><span class="sb-tooltip" data-i18n="home">الرئيسية</span>
+    </div>
+    <div class="sb-item" onclick="goTo('library',this)" tabindex="0">
+      <div class="sb-icon">📚</div><span class="sb-label" data-i18n="library">مكتبة المساقات</span><span class="sb-tooltip" data-i18n="library">مكتبة المساقات</span>
+    </div>
+    <div class="sb-item" onclick="goTo('forum',this)" tabindex="0">
+      <div class="sb-icon">💬</div><span class="sb-label" data-i18n="forum">المنتدى الأكاديمي</span><span class="sb-tooltip" data-i18n="forum">المنتدى الأكاديمي</span><span class="sb-badge">4</span>
+    </div>
+    <div class="sb-item" onclick="goTo('bot',this)" tabindex="0">
+      <div class="sb-icon">🤖</div><span class="sb-label" data-i18n="bot">وجّهني</span><span class="sb-tooltip" data-i18n="bot">وجّهني</span>
+    </div>
+    <div class="sb-item" onclick="goTo('career',this)" tabindex="0">
+      <div class="sb-icon">🗺️</div><span class="sb-label" data-i18n="career">اختبار المسار المهني</span><span class="sb-tooltip" data-i18n="career">اختبار المسار المهني</span>
+    </div>
+  </nav>
+
+  <div class="sb-footer">
+    <div class="sb-user">
+      <div class="sb-user-avatar">أ.م</div>
+      <div>
+        <div class="sb-user-name">أحمد محمد</div>
+        <div class="sb-user-id">220210145</div>
+      </div>
+    </div>
+  </div>
+</aside>
+
+<div id="main">
+  <div class="topbar">
+    <div class="topbar-left">
+      <button class="menu-btn" id="menuBtn" aria-label="menu" aria-expanded="false" aria-controls="sideMenu">☰</button>
+      <button class="login-btn" onclick="openLogin()" data-i18n="login">تسجيل الدخول</button>
+    </div>
+
+    <span class="topbar-title" id="topbar-title" data-i18n="home">الرئيسية</span>
+    <span class="topbar-sub" id="topbar-sub" data-i18n="welcome">أهلاً بك في وجهتي</span>
+
+    <div class="topbar-right">
+      <button class="icon-btn theme-btn" id="themeBtn" onclick="toggleTheme()" aria-label="theme">☾</button>
+      <button class="icon-btn lang-btn" id="langBtn" onclick="toggleLang()" aria-label="lang">EN</button>
+      <button class="bot-circle" onclick="goTo('bot',document.querySelector('.sb-item:nth-child(4)'))" aria-label="bot">🤖</button>
+    </div>
+
+    <div class="side-menu" id="sideMenu" role="menu" aria-label="menu">
+      <button class="side-menu-item" onclick="goTo('home',document.querySelector('.sb-item:nth-child(1)'));closeMenu()">🏠 <span data-i18n="home">الرئيسية</span></button>
+      <button class="side-menu-item" onclick="goTo('library',document.querySelector('.sb-item:nth-child(2)'));closeMenu()">📚 <span data-i18n="library">مكتبة المساقات</span></button>
+      <button class="side-menu-item" onclick="goTo('forum',document.querySelector('.sb-item:nth-child(3)'));closeMenu()">💬 <span data-i18n="forum">المنتدى الأكاديمي</span></button>
+      <button class="side-menu-item" onclick="goTo('bot',document.querySelector('.sb-item:nth-child(4)'));closeMenu()">🤖 <span data-i18n="bot">وجّهني</span></button>
+      <button class="side-menu-item" onclick="goTo('career',document.querySelector('.sb-item:nth-child(5)'));closeMenu()">🗺️ <span data-i18n="career">اختبار المسار المهني</span></button>
+    </div>
+  </div>
+
+  <div id="pages">
+    <div id="pg-home" class="page active">
+      <div class="home-hero">
+        <div class="home-hero-inner">
+          <div class="home-tag"><div class="pulse-dot"></div>خاص بطلاب جامعة الأزهر - غزة</div>
+          <h1 data-i18n="heroTitle">منصتك الأكاديمية<br>من <em>الدراسة</em> إلى سوق العمل</h1>
+          <p data-i18n="heroText">واجهة احترافية وواضحة تجمع كل شيء في مكان واحد: المحتوى الأكاديمي، المنتدى، البوت الذكي، والمسار المهني.</p>
+          <div class="home-hero-btns">
+            <button class="btn-white" onclick="goTo('library',document.querySelector('.sb-item:nth-child(2)'))" data-i18n="browseLibrary">استعرض المكتبة</button>
+            <button class="btn-outline-w" onclick="goTo('career',document.querySelector('.sb-item:nth-child(5)'))" data-i18n="discoverPath">اكتشف مسارك المهني</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="stat-row">
+        <div class="stat-box card"><div class="stat-val">42</div><div class="stat-lbl" data-i18n="stat1">مساق متاح</div><div class="stat-delta" data-i18n="stat1sub">↑ منظّم حسب الفصل</div></div>
+        <div class="stat-box card"><div class="stat-val">+300</div><div class="stat-lbl" data-i18n="stat2">ملف أكاديمي</div><div class="stat-delta" data-i18n="stat2sub">كتب · سلايدات · ملخصات</div></div>
+        <div class="stat-box card"><div class="stat-val">6</div><div class="stat-lbl" data-i18n="stat3">مسار مهني</div><div class="stat-delta" data-i18n="stat3sub">مع خطة تعلّم مجانية</div></div>
+        <div class="stat-box card"><div class="stat-val">24/7</div><div class="stat-lbl" data-i18n="stat4">وجّهني متاح</div><div class="stat-delta" data-i18n="stat4sub">مساعد ذكي دائماً جاهز</div></div>
+      </div>
+
+      <div class="grid-2">
+        <div class="card card-hover" onclick="goTo('library',document.querySelector('.sb-item:nth-child(2)'))">
+          <div class="feature-mini">
+            <div class="feature-mini-icon" style="background:var(--primary-soft)">📚</div>
+            <div><h4 data-i18n="feat1">مكتبة المساقات</h4><p data-i18n="feat1sub">كتب، سلايدات، ملخصات، ومحاضرات لكل مادة مرتبة حسب السنة والفصل.</p><div style="margin-top:10px"><span class="tag tag-blue" data-i18n="feat1tag">42 مساق</span></div></div>
+          </div>
+        </div>
+        <div class="card card-hover" onclick="goTo('forum',document.querySelector('.sb-item:nth-child(3)'))">
+          <div class="feature-mini">
+            <div class="feature-mini-icon" style="background:var(--teal-lt)">💬</div>
+            <div><h4 data-i18n="feat2">المنتدى الأكاديمي</h4><p data-i18n="feat2sub">شارك ملخصاتك، ناقش المواد، وتواصل مع زملائك في بيئة آمنة.</p><div style="margin-top:10px"><span class="tag tag-teal" data-i18n="feat2tag">4 مشاركات جديدة</span></div></div>
+          </div>
+        </div>
+        <div class="card card-hover" onclick="goTo('bot',document.querySelector('.sb-item:nth-child(4)'))">
+          <div class="feature-mini">
+            <div class="feature-mini-icon" style="background:#F0FDF4">🤖</div>
+            <div><h4 data-i18n="feat3">وجّهني — المساعد الذكي</h4><p data-i18n="feat3sub">اسأل عن أي مادة أو مفهوم، يشرح ويوجّه ويربط بسوق العمل.</p><div style="margin-top:10px"><span class="tag tag-teal" data-i18n="feat3tag">مدعوم بالذكاء الاصطناعي</span></div></div>
+          </div>
+        </div>
+        <div class="card card-hover" onclick="goTo('career',document.querySelector('.sb-item:nth-child(5)'))">
+          <div class="feature-mini">
+            <div class="feature-mini-icon" style="background:var(--amber-lt)">🗺️</div>
+            <div><h4 data-i18n="feat4">المسار المهني والكورسات</h4><p data-i18n="feat4sub">اختبار ذكي يكشف شغفك ويولّد خطة تعلّم كاملة بكورسات مجانية.</p><div style="margin-top:10px"><span class="tag tag-amber" data-i18n="feat4tag">6 مسارات متاحة</span></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="pg-library" class="page">
+      <div class="pg-header">
+        <div class="pg-eyebrow" data-i18n="academicContent">المحتوى الأكاديمي</div>
+        <div class="pg-title" data-i18n="library">مكتبة المساقات</div>
+        <div class="pg-sub" data-i18n="librarySub">اختر السنة الدراسية ثم المادة للوصول للمحتوى</div>
+      </div>
+
+      <div class="toolbar">
+        <div class="search-box">
+          <span>⌕</span>
+          <input id="courseSearch" type="text" placeholder="Search courses / ابحث عن مساق" oninput="searchCourses(this.value)">
+        </div>
+        <div class="toggle-group">
+          <button class="year-tab active" onclick="filterYear(this,'1')" data-i18n="yr1">السنة الأولى</button>
+          <button class="year-tab" onclick="filterYear(this,'2')" data-i18n="yr2">السنة الثانية</button>
+          <button class="year-tab" onclick="filterYear(this,'3')" data-i18n="yr3">السنة الثالثة</button>
+          <button class="year-tab" onclick="filterYear(this,'4')" data-i18n="yr4">السنة الرابعة</button>
+        </div>
+      </div>
+
+      <div class="grid-3" id="courses-grid"></div>
+    </div>
+
+    <div id="pg-forum" class="page">
+      <div class="pg-header">
+        <div class="pg-eyebrow" data-i18n="community">مجتمع الطلاب</div>
+        <div class="pg-title" data-i18n="forum">المنتدى الأكاديمي</div>
+        <div class="pg-sub" data-i18n="forumSub">شارك ملخصاتك وناقش مع زملائك</div>
+      </div>
+      <div class="new-post-btn" onclick="alert('قريباً — إنشاء مشاركة جديدة')" data-i18n="newPost">✏️ &nbsp; اكتب مشاركة جديدة أو شارك ملخصاً...</div>
+      <div class="forum-filter">
+        <button class="filter-btn active" data-i18n="all">الكل</button>
+        <button class="filter-btn" data-i18n="summaries">ملخصات</button>
+        <button class="filter-btn" data-i18n="questions">أسئلة</button>
+        <button class="filter-btn" data-i18n="discussions">نقاشات</button>
+        <button class="filter-btn" data-i18n="courses">كورسات</button>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:12px" id="forum-list"></div>
+    </div>
+
+    <div id="pg-career" class="page">
+      <div class="pg-header">
+        <div class="pg-eyebrow" data-i18n="discoverYourself">اكتشف نفسك</div>
+        <div class="pg-title" data-i18n="career">المسار المهني والكورسات</div>
+        <div class="pg-sub" data-i18n="careerSub">اختبار قصير يحدد شغفك ويعطيك خطة تعلّم كاملة مجاناً</div>
+      </div>
+
+      <div class="quiz-wrap">
+        <div class="quiz-step active" id="qs1">
+          <div class="quiz-progress"><div class="quiz-bar" style="width:20%"></div></div>
+          <div class="quiz-q" data-i18n="q1">١. ما الذي يشدّ اهتمامك أكثر عند دراسة البرمجة؟</div>
+          <div class="quiz-options">
+            <div class="quiz-opt" onclick="selectOpt(this)">🛡️ <span data-i18n="a11">فهم كيف تُكسر الأنظمة وكيف تُحمى</span></div>
+            <div class="quiz-opt" onclick="selectOpt(this)">🤖 <span data-i18n="a12">تعليم الحاسوب كيف يفكر ويتعلم</span></div>
+            <div class="quiz-opt" onclick="selectOpt(this)">📱 <span data-i18n="a13">بناء تطبيقات يستخدمها الناس</span></div>
+            <div class="quiz-opt" onclick="selectOpt(this)">☁️ <span data-i18n="a14">إدارة البنية التحتية والخوادم</span></div>
+          </div>
+          <div class="quiz-nav"><span></span><button class="btn btn-primary" onclick="nextQ(2)" data-i18n="next">التالي ←</button></div>
+        </div>
+
+        <div class="quiz-step" id="qs2">
+          <div class="quiz-progress"><div class="quiz-bar" style="width:40%"></div></div>
+          <div class="quiz-q" data-i18n="q2">٢. أي مشروع تحب تبنيه؟</div>
+          <div class="quiz-options">
+            <div class="quiz-opt" onclick="selectOpt(this)">🔍 <span data-i18n="a21">أداة لاكتشاف الثغرات الأمنية</span></div>
+            <div class="quiz-opt" onclick="selectOpt(this)">🧠 <span data-i18n="a22">نموذج يتعرف على الصور أو النصوص</span></div>
+            <div class="quiz-opt" onclick="selectOpt(this)">🌐 <span data-i18n="a23">موقع أو تطبيق موبايل</span></div>
+            <div class="quiz-opt" onclick="selectOpt(this)">🔌 <span data-i18n="a24">جهاز ذكي متصل بالإنترنت (IoT)</span></div>
+          </div>
+          <div class="quiz-nav">
+            <button class="btn btn-ghost" onclick="nextQ(1)" data-i18n="prev">→ السابق</button>
+            <button class="btn btn-primary" onclick="nextQ(3)" data-i18n="next">التالي ←</button>
+          </div>
+        </div>
+
+        <div class="quiz-step" id="qs3">
+          <div class="quiz-progress"><div class="quiz-bar" style="width:60%"></div></div>
+          <div class="quiz-q" data-i18n="q3">٣. ما أكثر مادة استمتعت فيها؟</div>
+          <div class="quiz-options">
+            <div class="quiz-opt" onclick="selectOpt(this)" data-i18n="a31">شبكات الحاسوب</div>
+            <div class="quiz-opt" onclick="selectOpt(this)" data-i18n="a32">الذكاء الاصطناعي / تعلّم الآلة</div>
+            <div class="quiz-opt" onclick="selectOpt(this)" data-i18n="a33">تطوير البرمجيات</div>
+            <div class="quiz-opt" onclick="selectOpt(this)" data-i18n="a34">المعالجات والأنظمة المدمجة</div>
+          </div>
+          <div class="quiz-nav">
+            <button class="btn btn-ghost" onclick="nextQ(2)" data-i18n="prev">→ السابق</button>
+            <button class="btn btn-primary" onclick="nextQ(4)" data-i18n="next">التالي ←</button>
+          </div>
+        </div>
+
+        <div class="quiz-step" id="qs4">
+          <div class="quiz-progress"><div class="quiz-bar" style="width:80%"></div></div>
+          <div class="quiz-q" data-i18n="q4">٤. كيف تفضّل تعلّم شيء جديد؟</div>
+          <div class="quiz-options">
+            <div class="quiz-opt" onclick="selectOpt(this)">🎥 <span data-i18n="a41">فيديوهات وكورسات عملية</span></div>
+            <div class="quiz-opt" onclick="selectOpt(this)">📖 <span data-i18n="a42">قراءة الوثائق والكتب التقنية</span></div>
+            <div class="quiz-opt" onclick="selectOpt(this)">💻 <span data-i18n="a43">تطبيق مباشر ومشاريع صغيرة</span></div>
+            <div class="quiz-opt" onclick="selectOpt(this)">👥 <span data-i18n="a44">نقاش مع الزملاء والمجتمع</span></div>
+          </div>
+          <div class="quiz-nav">
+            <button class="btn btn-ghost" onclick="nextQ(3)" data-i18n="prev">→ السابق</button>
+            <button class="btn btn-primary" onclick="showResult()" data-i18n="showResult">عرض نتيجتي 🎯</button>
+          </div>
+        </div>
+
+        <div class="quiz-step" id="qs-result">
+          <div class="quiz-progress"><div class="quiz-bar" style="width:100%"></div></div>
+          <div class="result-card">
+            <div class="result-icon">🛡️</div>
+            <div class="result-title" data-i18n="resultTitle">مسارك: الأمن السيبراني</div>
+            <div class="result-desc" data-i18n="resultDesc">أنت شخص يحب فهم الأنظمة من الداخل وإيجاد نقاط الضعف. هذا المجال بحاجة ماسّة لك في سوق العمل، وفرصه تزداد سنة بعد سنة.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="bot-page">
+    <div class="chat-wrap" id="chat-wrap">
+      <div class="msg msg-bot">
+        <div class="msg-avatar bot-av">🤖</div>
+        <div>
+          <div class="bubble bubble-bot" data-i18n="botWelcome">مرحباً! أنا وجّهني 👋<br>مساعدك الذكي المتخصص في هندسة أنظمة الحاسوب. اسألني عن أي مادة، مفهوم، أو مسار مهني — وأنا هنا أساعدك.</div>
+          <div class="msg-time" data-i18n="now">الآن</div>
+        </div>
+      </div>
+    </div>
+    <div class="chat-bar">
+      <textarea id="chat-input" rows="1" placeholder="اسأل عن أي مادة أو مفهوم..." onkeydown="handleKey(event)"></textarea>
+      <button class="send-btn" onclick="sendMsg()">↑</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal" id="loginModal" role="dialog" aria-modal="true" aria-labelledby="loginTitle">
+  <div class="modal-card">
+    <div class="modal-head">
+      <div class="modal-title" id="loginTitle" data-i18n="login">تسجيل الدخول</div>
+      <button class="close-btn" onclick="closeLogin()">✕</button>
+    </div>
+    <div class="field">
+      <label data-i18n="email">البريد الإلكتروني</label>
+      <input type="email" placeholder="name@example.com">
+    </div>
+    <div class="field">
+      <label data-i18n="password">كلمة المرور</label>
+      <input type="password" placeholder="••••••••">
+    </div>
+    <div class="auth-actions">
+      <button class="btn btn-primary" data-i18n="login">تسجيل الدخول</button>
+      <button class="btn btn-ghost" onclick="closeLogin()" data-i18n="cancel">إلغاء</button>
+    </div>
+    <div class="auth-note" data-i18n="authNote">تصميم سريع ومرن يدعم كل الأجهزة والاتجاهين واللغتين مع وضع فاتح/داكن.</div>
+  </div>
+</div>
+
+</div>
+
+<script>
+const i18n = {
+  ar: {
+    brand:'وجهتي', subtitle:'هندسة أنظمة الحاسوب', home:'الرئيسية', library:'مكتبة المساقات', forum:'المنتدى الأكاديمي', bot:'وجّهني', career:'اختبار المسار المهني',
+    login:'تسجيل الدخول', welcome:'أهلاً بك في وجهتي', heroTitle:'منصتك الأكاديمية<br>من <em>الدراسة</em> إلى سوق العمل', heroText:'واجهة احترافية وواضحة تجمع كل شيء في مكان واحد: المحتوى الأكاديمي، المنتدى، البوت الذكي، والمسار المهني.', browseLibrary:'استعرض المكتبة', discoverPath:'اكتشف مسارك المهني',
+    stat1:'مساق متاح', stat1sub:'↑ منظّم حسب الفصل', stat2:'ملف أكاديمي', stat2sub:'كتب · سلايدات · ملخصات', stat3:'مسار مهني', stat3sub:'مع خطة تعلّم مجانية', stat4:'وجّهني متاح', stat4sub:'مساعد ذكي دائماً جاهز',
+    feat1:'مكتبة المساقات', feat1sub:'كتب، سلايدات، ملخصات، ومحاضرات لكل مادة مرتبة حسب السنة والفصل.', feat1tag:'42 مساق',
+    feat2:'المنتدى الأكاديمي', feat2sub:'شارك ملخصاتك، ناقش المواد، وتواصل مع زملائك في بيئة آمنة.', feat2tag:'4 مشاركات جديدة',
+    feat3:'وجّهني — المساعد الذكي', feat3sub:'اسأل عن أي مادة أو مفهوم، يشرح ويوجّه ويربط بسوق العمل.', feat3tag:'مدعوم بالذكاء الاصطناعي',
+    feat4:'المسار المهني والكورسات', feat4sub:'اختبار ذكي يكشف شغفك ويولّد خطة تعلّم كاملة بكورسات مجانية.', feat4tag:'6 مسارات متاحة',
+    academicContent:'المحتوى الأكاديمي', librarySub:'اختر السنة الدراسية ثم المادة للوصول للمحتوى',
+    yr1:'السنة الأولى', yr2:'السنة الثانية', yr3:'السنة الثالثة', yr4:'السنة الرابعة',
+    community:'مجتمع الطلاب', forumSub:'شارك ملخصاتك وناقش مع زملائك', newPost:'✏️ &nbsp; اكتب مشاركة جديدة أو شارك ملخصاً...', all:'الكل', summaries:'ملخصات', questions:'أسئلة', discussions:'نقاشات', courses:'كورسات',
+    discoverYourself:'اكتشف نفسك', careerSub:'اختبار قصير يحدد شغفك ويعطيك خطة تعلّم كاملة مجاناً',
+    q1:'١. ما الذي يشدّ اهتمامك أكثر عند دراسة البرمجة؟', a11:'فهم كيف تُكسر الأنظمة وكيف تُحمى', a12:'تعليم الحاسوب كيف يفكر ويتعلم', a13:'بناء تطبيقات يستخدمها الناس', a14:'إدارة البنية التحتية والخوادم',
+    q2:'٢. أي مشروع تحب تبنيه؟', a21:'أداة لاكتشاف الثغرات الأمنية', a22:'نموذج يتعرف على الصور أو النصوص', a23:'موقع أو تطبيق موبايل', a24:'جهاز ذكي متصل بالإنترنت (IoT)',
+    q3:'٣. ما أكثر مادة استمتعت فيها؟', a31:'شبكات الحاسوب', a32:'الذكاء الاصطناعي / تعلّم الآلة', a33:'تطوير البرمجيات', a34:'المعالجات والأنظمة المدمجة',
+    q4:'٤. كيف تفضّل تعلّم شيء جديد؟', a41:'فيديوهات وكورسات عملية', a42:'قراءة الوثائق والكتب التقنية', a43:'تطبيق مباشر ومشاريع صغيرة', a44:'نقاش مع الزملاء والمجتمع',
+    next:'التالي ←', prev:'→ السابق', showResult:'عرض نتيجتي 🎯', resultTitle:'مسارك: الأمن السيبراني', resultDesc:'أنت شخص يحب فهم الأنظمة من الداخل وإيجاد نقاط الضعف. هذا المجال بحاجة ماسّة لك في سوق العمل، وفرصه تزداد سنة بعد سنة.',
+    botWelcome:'مرحباً! أنا وجّهني 👋<br>مساعدك الذكي المتخصص في هندسة أنظمة الحاسوب. اسألني عن أي مادة، مفهوم، أو مسار مهني — وأنا هنا أساعدك.', now:'الآن',
+    email:'البريد الإلكتروني', password:'كلمة المرور', cancel:'إلغاء', authNote:'تصميم سريع ومرن يدعم كل الأجهزة والاتجاهين واللغتين مع وضع فاتح/داكن.'
+  },
+  en: {
+    brand:'Wajhati', subtitle:'Computer Systems Engineering', home:'Home', library:'Courses', forum:'Forum', bot:'Guide Me', career:'Career Test',
+    login:'Login', welcome:'Welcome to Wajhati', heroTitle:'Your academic platform<br>from <em>study</em> to career', heroText:'A clean, professional interface that brings together academic content, the forum, the smart bot, and your career path in one place.', browseLibrary:'Browse Library', discoverPath:'Discover Career Path',
+    stat1:'Available courses', stat1sub:'↑ Organized by semester', stat2:'Academic files', stat2sub:'Books · Slides · Summaries', stat3:'Career paths', stat3sub:'With a free learning plan', stat4:'Guide Me online', stat4sub:'Smart assistant always ready',
+    feat1:'Course Library', feat1sub:'Books, slides, summaries, and lectures organized by year and semester.', feat1tag:'42 courses',
+    feat2:'Academic Forum', feat2sub:'Share summaries, discuss courses, and connect with classmates in a safe space.', feat2tag:'4 new posts',
+    feat3:'Guide Me — Smart Bot', feat3sub:'Ask about any subject or concept and get guidance linked to the job market.', feat3tag:'AI powered',
+    feat4:'Career Paths & Courses', feat4sub:'A smart test that reveals your interests and generates a full free learning roadmap.', feat4tag:'6 paths',
+    academicContent:'Academic Content', librarySub:'Choose year and course to access materials',
+    yr1:'Year 1', yr2:'Year 2', yr3:'Year 3', yr4:'Year 4',
+    community:'Student Community', forumSub:'Share summaries and discuss with classmates', newPost:'✏️ &nbsp; Write a new post or share a summary...', all:'All', summaries:'Summaries', questions:'Questions', discussions:'Discussions', courses:'Courses',
+    discoverYourself:'Discover yourself', careerSub:'A short test that reveals your interests and gives you a free learning roadmap.',
+    q1:'1. What interests you most when studying programming?', a11:'Understanding how systems are broken and protected', a12:'Teaching computers how to think and learn', a13:'Building apps people use', a14:'Managing infrastructure and servers',
+    q2:'2. What kind of project would you like to build?', a21:'A tool that finds security vulnerabilities', a22:'A model that recognizes images or text', a23:'A website or mobile app', a24:'A connected smart device (IoT)',
+    q3:'3. Which subject did you enjoy most?', a31:'Computer Networks', a32:'AI / Machine Learning', a33:'Software Development', a34:'Processors and Embedded Systems',
+    q4:'4. How do you prefer learning something new?', a41:'Video tutorials and hands-on courses', a42:'Reading documentation and technical books', a43:'Direct practice and small projects', a44:'Discussion with peers and community',
+    next:'Next →', prev:'← Back', showResult:'Show Result 🎯', resultTitle:'Your path: Cybersecurity', resultDesc:'You enjoy understanding systems from the inside and finding weak points. This field needs you, and the opportunities keep growing.',
+    botWelcome:'Hello! I am Guide Me 👋<br>Your smart assistant specialized in Computer Systems Engineering. Ask me about any course, concept, or career path — I’m here to help.', now:'Now',
+    email:'Email', password:'Password', cancel:'Cancel', authNote:'A fast, flexible design that supports all devices, both directions, both languages, and light/dark mode.'
+  }
+};
+
+const courses = {
+  '1': [
+    {icon:'🔢',nameAr:'رياضيات منفصلة',nameEn:'Discrete Mathematics',code:'CSE101',r:['كتاب','سلايدات','ملخص']},
+    {icon:'💻',nameAr:'مقدمة في البرمجة',nameEn:'Intro to Programming',code:'CSE102',r:['كتاب','سلايدات','ملخص','محاضرات']},
+    {icon:'⚡',nameAr:'إلكترونيات رقمية',nameEn:'Digital Electronics',code:'CSE103',r:['كتاب','سلايدات']},
+    {icon:'📐',nameAr:'حساب التفاضل والتكامل',nameEn:'Calculus',code:'MATH101',r:['كتاب','ملخص']},
+    {icon:'🔬',nameAr:'فيزياء',nameEn:'Physics',code:'PHY101',r:['كتاب','سلايدات','ملخص']},
+    {icon:'🗣️',nameAr:'مهارات التواصل',nameEn:'Communication Skills',code:'ENG101',r:['سلايدات','ملخص']}
+  ],
+  '2': [
+    {icon:'🏗️',nameAr:'بنية الحاسوب',nameEn:'Computer Architecture',code:'CSE201',r:['كتاب','سلايدات','ملخص','محاضرات']},
+    {icon:'🌐',nameAr:'شبكات الحاسوب',nameEn:'Computer Networks',code:'CSE202',r:['كتاب','سلايدات','ملخص']},
+    {icon:'🧮',nameAr:'خوارزميات وهياكل بيانات',nameEn:'Algorithms & DS',code:'CSE203',r:['كتاب','سلايدات','ملخص','محاضرات']},
+    {icon:'⚙️',nameAr:'أنظمة التشغيل',nameEn:'Operating Systems',code:'CSE204',r:['كتاب','سلايدات','ملخص']},
+    {icon:'🗃️',nameAr:'قواعد البيانات',nameEn:'Databases',code:'CSE205',r:['كتاب','سلايدات','ملخص','محاضرات']},
+    {icon:'📊',nameAr:'احتمالات وإحصاء',nameEn:'Probability & Statistics',code:'MATH201',r:['كتاب','ملخص']}
+  ],
+  '3': [
+    {icon:'🤖',nameAr:'الذكاء الاصطناعي',nameEn:'Artificial Intelligence',code:'CSE301',r:['كتاب','سلايدات','ملخص']},
+    {icon:'🛡️',nameAr:'أمن المعلومات',nameEn:'Information Security',code:'CSE302',r:['كتاب','سلايدات','ملخص','محاضرات']},
+    {icon:'📱',nameAr:'تطوير تطبيقات الجوال',nameEn:'Mobile App Development',code:'CSE303',r:['سلايدات','محاضرات']},
+    {icon:'☁️',nameAr:'الحوسبة السحابية',nameEn:'Cloud Computing',code:'CSE304',r:['كتاب','سلايدات']},
+    {icon:'🔌',nameAr:'الأنظمة المدمجة',nameEn:'Embedded Systems',code:'CSE305',r:['كتاب','سلايدات','ملخص']},
+    {icon:'🧠',nameAr:'تعلّم الآلة',nameEn:'Machine Learning',code:'CSE306',r:['كتاب','ملخص']}
+  ],
+  '4': [
+    {icon:'🚀',nameAr:'مشروع التخرج',nameEn:'Graduation Project',code:'CSE401',r:['إرشادات','نماذج']},
+    {icon:'💼',nameAr:'ريادة الأعمال التقنية',nameEn:'Tech Entrepreneurship',code:'CSE402',r:['سلايدات','ملخص']},
+    {icon:'🔒',nameAr:'أمن الشبكات المتقدم',nameEn:'Advanced Network Security',code:'CSE403',r:['كتاب','سلايدات']},
+    {icon:'📡',nameAr:'الاتصالات اللاسلكية',nameEn:'Wireless Communications',code:'CSE404',r:['كتاب','سلايدات','ملخص']},
+    {icon:'🧬',nameAr:'البيانات الضخمة',nameEn:'Big Data',code:'CSE405',r:['سلايدات','محاضرات']}
+  ]
+};
+const iconMap = {كتاب:'📖',سلايدات:'🖼️',ملخص:'📝',محاضرات:'🎥',إرشادات:'📋',نماذج:'📄'};
+const posts = [
+  {av:'av1',name:'أحمد محمد',nameEn:'Ahmed Mohammad',id:'220210145',timeAr:'منذ ساعتين',timeEn:'2 hours ago',tag:'ملخصات',titleAr:'ملخص شامل لمادة شبكات الحاسوب — الفصل الثاني',titleEn:'Comprehensive Networks Summary — Semester 2',excerptAr:'شاملة كل نماذج OSI وTCP/IP مع أمثلة على الامتحانات السابقة وحلولها المفصّلة.',excerptEn:'Covers OSI and TCP/IP with examples and previous exam solutions.',likes:34,comments:12,downloads:87},
+  {av:'av2',name:'سارة رمضان',nameEn:'Sara Ramadan',id:'220210203',timeAr:'منذ 5 ساعات',timeEn:'5 hours ago',tag:'أسئلة',titleAr:'سؤال: هل يُسأل Deadlock في امتحان أنظمة التشغيل؟',titleEn:'Question: Is deadlock asked in OS exams?',excerptAr:'كنت أراجع وحيرتني هذه المسألة، هل تجي في الامتحان النهائي؟ وما أهم نقاطها؟',excerptEn:'I was reviewing this topic; does it appear in the final and what matters most?',likes:8,comments:19,downloads:0},
+  {av:'av3',name:'محمود عبدالله',nameEn:'Mahmoud Abdullah',id:'210210088',timeAr:'أمس',timeEn:'Yesterday',tag:'كورسات',titleAr:'مشاركة: أفضل كورس Python مجاني وجدته',titleEn:'Best free Python course I found',excerptAr:'ساعدني كثير في مشروع AI course project، أنصح فيه الكل خصوصاً اللي ما بيعرفوا Python.',excerptEn:'Very helpful for my AI project. Highly recommended for beginners.',likes:51,comments:7,downloads:0},
+  {av:'av4',name:'لمى حسن',nameEn:'Lama Hassan',id:'220210311',timeAr:'منذ يومين',timeEn:'2 days ago',tag:'نقاشات',titleAr:'نقاش: ما المسار المهني الأنسب لخريج هندسة أنظمة؟',titleEn:'Discussion: Best career path for systems engineering graduates?',excerptAr:'جلسة نقاش مفتوح حول فرص العمل في غزة وخارجها، شاركوا تجاربكم وآراءكم.',excerptEn:'Open discussion about career opportunities locally and abroad.',likes:63,comments:41,downloads:0}
+];
+const tagColors={ملخصات:'tag-blue',أسئلة:'tag-teal',كورسات:'tag-amber',نقاشات:'tag-rose'};
+let currentYear='1';
+let currentLang='ar';
+
+function t(k){return i18n[currentLang][k] || k}
+function applyTexts(){
+  document.documentElement.lang = currentLang==='ar' ? 'ar' : 'en';
+  document.documentElement.dir = currentLang==='ar' ? 'rtl' : 'ltr';
+  document.body.className = currentLang==='ar' ? 'ar' : 'en';
+  document.querySelectorAll('[data-i18n]').forEach(el=>{
+    const key = el.getAttribute('data-i18n');
+    el.innerHTML = t(key);
+  });
+  document.getElementById('langBtn').textContent = currentLang==='ar' ? 'EN' : 'AR';
+  renderCourses(currentYear);
+  renderForum();
+}
+function toggleLang(){ currentLang = currentLang==='ar' ? 'en' : 'ar'; localStorage.setItem('lang', currentLang); applyTexts(); }
+
+function toggleTheme(){
+  const next = document.body.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+  document.body.setAttribute('data-theme', next);
+  localStorage.setItem('theme', next);
+  document.getElementById('themeBtn').textContent = next==='dark' ? '☀' : '☾';
+}
+
+function loadPrefs(){
+  const theme = localStorage.getItem('theme');
+  const lang = localStorage.getItem('lang');
+  if(theme) document.body.setAttribute('data-theme', theme);
+  else if(window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) document.body.setAttribute('data-theme','dark');
+  if(lang) currentLang = lang;
+  document.getElementById('themeBtn').textContent = document.body.getAttribute('data-theme') === 'dark' ? '☀' : '☾';
+  applyTexts();
+}
+loadPrefs();
+
+function goTo(page, el){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.getElementById('bot-page').style.display='none';
+  document.getElementById('pages').style.display='block';
+  document.querySelectorAll('.sb-item').forEach(i=>i.classList.remove('active'));
+  if(el) el.classList.add('active');
+  document.getElementById('topbar-title').textContent = page === 'home' ? t('home') : t(page);
+  document.getElementById('topbar-sub').textContent = page === 'home' ? t('welcome') : t(page + 'Sub') || '';
+  if(page==='bot'){
+    document.getElementById('pages').style.display='none';
+    document.getElementById('bot-page').style.display='flex';
+  } else {
+    const pg=document.getElementById('pg-'+page);
+    if(pg) pg.classList.add('active');
+  }
+  closeMenu();
+}
+
+function renderCourses(year){
+  const grid=document.getElementById('courses-grid');
+  grid.innerHTML='';
+  const q=(document.getElementById('courseSearch')?.value || '').trim().toLowerCase();
+  (courses[year]||[]).filter(c=>{
+    const name = currentLang==='ar' ? c.nameAr : c.nameEn;
+    return !q || name.toLowerCase().includes(q) || c.code.toLowerCase().includes(q);
+  }).forEach(c=>{
+    const name = currentLang==='ar' ? c.nameAr : c.nameEn;
+    const chips=c.r.map(r=>`<span class="resource-chip">${iconMap[r]||'📄'} ${r}</span>`).join('');
+    grid.innerHTML += `
+      <div class="course-card card-hover" tabindex="0">
+        <div class="course-card-top">
+          <div class="course-card-icon">${c.icon}</div>
+          <h4>${name}</h4>
+          <p>${c.code}</p>
+        </div>
+        <div class="course-card-footer">${chips}</div>
+      </div>`;
+  });
+}
+function filterYear(btn, year){
+  currentYear=year;
+  document.querySelectorAll('.year-tab').forEach(t=>t.classList.remove('active'));
+  btn.classList.add('active');
+  renderCourses(year);
+}
+function searchCourses(){ renderCourses(currentYear); }
+function renderForum(){
+  const list=document.getElementById('forum-list');
+  list.innerHTML='';
+  posts.forEach(p=>{
+    const name = currentLang==='ar' ? p.name : p.nameEn;
+    const time = currentLang==='ar' ? p.timeAr : p.timeEn;
+    const title = currentLang==='ar' ? p.titleAr : p.titleEn;
+    const excerpt = currentLang==='ar' ? p.excerptAr : p.excerptEn;
+    const dl = p.downloads ? `<span class="post-stat">⬇️ ${p.downloads}</span>` : '';
+    list.innerHTML += `
+      <div class="post-card card-hover" tabindex="0">
+        <div class="post-head">
+          <div class="avatar ${p.av}">${name[0]}</div>
+          <div><div class="post-user-name">${name}</div><div class="post-user-id">${p.id}</div></div>
+          <div class="post-time">${time}</div>
+        </div>
+        <div style="margin-bottom:8px"><span class="tag ${tagColors[p.tag]}">${p.tag}</span></div>
+        <div class="post-title">${title}</div>
+        <div class="post-excerpt">${excerpt}</div>
+        <div class="post-foot">
+          <span class="post-stat">👍 ${p.likes}</span>
+          <span class="post-stat">💬 ${p.comments}</span>
+          ${dl}
+        </div>
+      </div>`;
+  });
+}
+
+function selectOpt(el){
+  el.closest('.quiz-options').querySelectorAll('.quiz-opt').forEach(o=>o.classList.remove('selected'));
+  el.classList.add('selected');
+}
+function nextQ(n){
+  document.querySelectorAll('.quiz-step').forEach(s=>s.classList.remove('active'));
+  document.getElementById('qs'+n).classList.add('active');
+}
+function showResult(){
+  document.querySelectorAll('.quiz-step').forEach(s=>s.classList.remove('active'));
+  document.getElementById('qs-result').classList.add('active');
+}
+function appendMsg(role,text){
+  const wrap=document.getElementById('chat-wrap');
+  const msg=document.createElement('div');
+  msg.className='msg '+(role==='user'?'msg-user':'msg-bot');
+  msg.innerHTML = role==='user'
+    ? `<div class="msg-avatar user-av">أ</div><div><div class="bubble bubble-user"></div><div class="msg-time">${t('now')}</div></div>`
+    : `<div class="msg-avatar bot-av">🤖</div><div><div class="bubble bubble-bot"></div><div class="msg-time">${t('now')}</div></div>`;
+  msg.querySelector('.bubble').textContent = text;
+  wrap.appendChild(msg);
+  wrap.scrollTop = wrap.scrollHeight;
+}
+function sendMsg(){
+  const input=document.getElementById('chat-input');
+  const text=input.value.trim();
+  if(!text) return;
+  input.value='';
+  appendMsg('user',text);
+  setTimeout(()=>appendMsg('bot', currentLang==='ar'
+    ? 'أكيد! اكتب سؤالك بشكل أوضح وسأشرح لك بطريقة بسيطة ومختصرة.'
+    : 'Sure! Ask more specifically and I’ll explain it clearly and briefly.'), 350);
+}
+function handleKey(e){
+  if(e.key==='Enter'&&!e.shiftKey){
+    e.preventDefault();
+    sendMsg();
+  }
+}
+
+const menuBtn=document.getElementById('menuBtn');
+const sideMenu=document.getElementById('sideMenu');
+function closeMenu(){ sideMenu.classList.remove('open'); menuBtn.setAttribute('aria-expanded','false'); }
+function toggleMenu(){ const open = sideMenu.classList.toggle('open'); menuBtn.setAttribute('aria-expanded',String(open)); }
+menuBtn.addEventListener('click', toggleMenu);
+document.addEventListener('keydown',e=>{ if(e.key==='Escape') closeMenu(); });
+document.addEventListener('click',e=>{ if(!sideMenu.contains(e.target) && e.target!==menuBtn) closeMenu(); });
+
+function openLogin(){ document.getElementById('loginModal').classList.add('open'); }
+function closeLogin(){ document.getElementById('loginModal').classList.remove('open'); }
+document.addEventListener('keydown',e=>{ if(e.key==='Escape') closeLogin(); });
+document.getElementById('loginModal').addEventListener('click',e=>{ if(e.target.id==='loginModal') closeLogin(); });
+
+renderCourses('1');
+renderForum();
+</script>
+</body>
+</html>
